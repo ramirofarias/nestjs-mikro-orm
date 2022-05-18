@@ -7,8 +7,10 @@ import {
   Patch,
   Post,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
+import { isPublic } from '../../shared/decorators/is-public.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -16,11 +18,13 @@ import { UsersService } from './users.service';
 
 @UseGuards(JwtAuthGuard)
 @Controller('users')
+@isPublic()
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
+  create(@Req() req, @Body() createUserDto: CreateUserDto) {
+    console.log(createUserDto);
     return this.usersService.create(createUserDto);
   }
 

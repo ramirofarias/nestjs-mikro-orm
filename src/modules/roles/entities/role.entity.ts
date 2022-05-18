@@ -7,6 +7,6 @@ export class Role extends CustomBaseEntity {
   @Property()
   name: string;
 
-  @ManyToMany(() => User)
-  users: Collection<User> = new Collection<User>(this);
+  @ManyToMany(() => User, 'roles', { owner: true })
+  users = new Collection<User>(this);
 }

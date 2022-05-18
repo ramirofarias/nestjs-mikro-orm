@@ -16,11 +16,22 @@ export class UsersService {
   async create(createUserDto: CreateUserDto) {
     const password = hashPassword(createUserDto.password);
     const user = this.userRepository.create({ password, ...createUserDto });
-    return await this.userRepository.persistAndFlush(user);
+    await this.userRepository.persistAndFlush(user);
+    return user;
   }
 
   async findAll() {
-    return await this.userRepository.findAll();
+    return this.userRepository.findAll({
+      fields: [
+        'id',
+        'firstName',
+        'lastName',
+        'email',
+        'country',
+        'roles',
+        { country: ['name'], roles: ['name'] },
+      ],
+    });
   }
 
   async paginate(query: any) {
