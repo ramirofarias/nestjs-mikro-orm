@@ -17,13 +17,10 @@ export class AuthService {
     return this.usersService.create(user);
   }
 
-  public async login(user: any) {
-    console.log(user);
-    const payload: Partial<User> = {
+  public login(user: User): { accessToken: string } {
+    const payload = {
       email: user.email,
-      id: user.id,
-      firstName: user.firstName,
-      lastName: user.lastName,
+      sub: user.id,
     };
     return {
       accessToken: this.jwtService.sign(payload),

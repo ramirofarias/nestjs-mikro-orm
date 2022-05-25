@@ -10,15 +10,15 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { isPublic } from '../../shared/decorators/is-public.decorator';
+import { CurrentUser } from '../../shared/decorators/current-user.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { User } from './entities/user.entity';
 import { UsersService } from './users.service';
 
 @UseGuards(JwtAuthGuard)
 @Controller('users')
-@isPublic()
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -29,7 +29,8 @@ export class UsersController {
   }
 
   @Get()
-  findAll() {
+  findAll(@CurrentUser() user: User) {
+    console.log(user);
     return this.usersService.findAll();
   }
 
