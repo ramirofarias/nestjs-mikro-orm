@@ -5,10 +5,12 @@ import {
   ManyToOne,
   Property,
 } from '@mikro-orm/core';
+import { SoftDeletable } from 'mikro-orm-soft-delete';
 import { CustomBaseEntity } from '../../../shared/entities/base.entity';
 import { Country } from '../../countries/entities/country.entity';
 import { Role } from '../../roles/entities/role.entity';
 
+@SoftDeletable(() => User, 'deletedAt', () => new Date())
 @Entity()
 export class User extends CustomBaseEntity {
   @Property()
@@ -34,4 +36,7 @@ export class User extends CustomBaseEntity {
     entity: () => Country,
   })
   country?: Country;
+
+  @Property({ nullable: true })
+  deletedAt?: Date;
 }

@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from 'src/modules/users/dto/create-user.dto';
 import { UsersService } from 'src/modules/users/users.service';
+import { User } from '../users/entities/user.entity';
 import LoginDto from './dto/login.dto';
 import { passwordIsCorrect } from './utils/bcrypt';
 
@@ -17,9 +18,15 @@ export class AuthService {
   }
 
   public async login(user: any) {
-    const payload = { email: user.email, sub: user.id };
+    console.log(user);
+    const payload: Partial<User> = {
+      email: user.email,
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+    };
     return {
-      access_token: this.jwtService.sign(payload),
+      accessToken: this.jwtService.sign(payload),
     };
   }
 
