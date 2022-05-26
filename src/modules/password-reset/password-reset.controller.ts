@@ -1,8 +1,9 @@
 import { Body, Controller, Post } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { PasswordResetService } from './password-reset.service';
 
-// @Throttle(1, 60)
+@Throttle(1, 60)
 @Controller('password-reset')
 export class PasswordResetController {
   constructor(private passwordResetService: PasswordResetService) {}

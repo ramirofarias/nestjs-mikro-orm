@@ -3,6 +3,8 @@ import { EntityRepository } from '@mikro-orm/postgresql';
 import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
 import * as crypto from 'crypto';
+import { MailJobsEnum } from '../../mail/mail-job.types';
+import { MailService } from '../../mail/mail.service';
 import { UsersService } from '../users/users.service';
 import { PasswordReset } from './password-reset.entity';
 
@@ -12,7 +14,8 @@ export class PasswordResetService {
     @InjectRepository(PasswordReset)
     private readonly passwordResetRepository: EntityRepository<PasswordReset>,
     private usersService: UsersService,
-    private mailService: MailerService,
+    private mailerService: MailerService,
+    private mailService: MailService,
   ) {}
 
   async findByEmail(email: string) {
@@ -53,14 +56,9 @@ export class PasswordResetService {
   private async sendPasswordResetEmail(email: string, token: string) {
     const url = `http://localhost:3000/forgot-password/${token}`;
 
-    this.mailService.sendMail({
-      to: email,
-      from: '"Nest test" <nest@test.com>', // override default from
-      subject: 'Reset password',
-      template: 'password-reset',
-      context: {
-        url,
-      },
+    this.mailService.enqueueMail(MailJobsEnum.PasswordReset, {
+      email: email,
+      url: url,
     });
   }
 }

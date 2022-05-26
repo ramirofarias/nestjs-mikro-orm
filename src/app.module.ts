@@ -1,6 +1,7 @@
 import { MikroOrmModule } from '@mikro-orm/nestjs';
+import { BullModule } from '@nestjs/bull';
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { AppController } from './app.controller';
@@ -24,6 +25,15 @@ import { SharedModule } from './shared/shared.module';
     ThrottlerModule.forRoot({
       limit: 1000,
       ttl: 60,
+    }),
+    BullModule.forRootAsync({
+      useFactory: async (config: ConfigService) => ({
+        redis: {
+          host: config.get('MAIL_QUEUE_HOST'),
+          port: config.get('MAIL_QUEUE_PORT'),
+        },
+      }),
+      inject: [ConfigService],
     }),
     MailModule,
     UsersModule,
