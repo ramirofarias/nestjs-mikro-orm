@@ -1,5 +1,6 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, Res } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
+import { Response } from 'express';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { PasswordResetService } from './password-reset.service';
 
@@ -9,7 +10,13 @@ export class PasswordResetController {
   constructor(private passwordResetService: PasswordResetService) {}
 
   @Post()
-  async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
-    return this.passwordResetService.forgotPassword(forgotPasswordDto.email);
+  async forgotPassword(
+    @Body() forgotPasswordDto: ForgotPasswordDto,
+    @Res() res: Response,
+  ) {
+    await this.passwordResetService.forgotPassword(forgotPasswordDto.email);
+    return res.status(200).send({
+      message: 'Email enviado',
+    });
   }
 }
