@@ -15,8 +15,8 @@ export class CreateUserDto {
   )
   email: string;
   @IsString()
-  @Length(8, undefined, {
-    message: 'Debe ingresar una contraseña de al menos 8 caracteres',
+  @Length(8, 64, {
+    message: 'Debe ingresar una contraseña de entre 8 y 64 caracteres',
   })
   password: string;
   @IsString()

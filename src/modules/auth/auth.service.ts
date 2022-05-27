@@ -4,7 +4,7 @@ import { CreateUserDto } from 'src/modules/users/dto/create-user.dto';
 import { UsersService } from 'src/modules/users/users.service';
 import { User } from '../users/entities/user.entity';
 import LoginDto from './dto/login.dto';
-import { passwordIsCorrect } from './utils/bcrypt';
+import { inputMatchesEncryption } from './utils/bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -29,7 +29,7 @@ export class AuthService {
 
   public async validateUser(request: LoginDto) {
     const user = await this.usersService.findByEmail(request.email);
-    if (user && passwordIsCorrect(request.password, user.password)) {
+    if (user && inputMatchesEncryption(request.password, user.password)) {
       return user;
     } else throw new UnauthorizedException('Credenciales incorrectas');
   }

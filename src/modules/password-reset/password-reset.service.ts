@@ -1,3 +1,4 @@
+import { NotFoundError, ValidationError } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityRepository } from '@mikro-orm/postgresql';
 import { MailerService } from '@nestjs-modules/mailer';
@@ -5,7 +6,9 @@ import { Injectable } from '@nestjs/common';
 import * as crypto from 'crypto';
 import { MailJobsEnum } from '../../mail/mail-job.types';
 import { MailService } from '../../mail/mail.service';
+import { hash } from '../auth/utils/bcrypt';
 import { UsersService } from '../users/users.service';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 import { PasswordReset } from './password-reset.entity';
 
 @Injectable()
@@ -60,5 +63,28 @@ export class PasswordResetService {
       email: email,
       url: url,
     });
+  }
+
+  private async resetPassword(resetPasswordDto: ResetPasswordDto) {
+    const resetAttempt = await this.passwordResetRepository.findOne({
+      token: resetPasswordDto.token,
+    });
+    if (!resetAttempt) {
+      throw new NotFoundError('Invalid token');
+    }
+    if (resetAttempt.expiresAt < new Date()) {
+      this.passwordResetRepository.remove(resetAttempt);
+      throw new ValidationError('Invalid token');
+    }
+
+    const user = await this.usersService.findByEmail(resetAttempt.email);
+    if (!user) {
+      throw new NotFoundError('User not found');
+    }
+
+    user.password = hash(resetPasswordDto.password);
+    this.usersService.update(user.id, user);
+    this.passwordResetRepository.remove(resetAttempt);
+    return user;
   }
 }

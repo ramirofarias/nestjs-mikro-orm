@@ -1,7 +1,7 @@
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityRepository } from '@mikro-orm/postgresql';
 import { Injectable } from '@nestjs/common';
-import { hashPassword } from '../auth/utils/bcrypt';
+import { hash } from '../auth/utils/bcrypt';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
@@ -14,7 +14,7 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto) {
-    const password = hashPassword(createUserDto.password);
+    const password = hash(createUserDto.password);
     const user = this.userRepository.create({ password, ...createUserDto });
     await this.userRepository.persistAndFlush(user);
     return user;
