@@ -8,12 +8,14 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
+import { isPublic } from '../../shared/decorators/is-public.decorator';
 import { CreateUserDto } from './dto/create-user.dto';
 import { PaginatedUsersDto } from './dto/paginated-users.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
 
 @Controller('users')
+@isPublic()
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 

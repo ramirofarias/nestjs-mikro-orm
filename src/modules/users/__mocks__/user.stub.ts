@@ -9,6 +9,4 @@ export const userStub = (): Partial<User> => ({
   address: 'address',
   country: null,
   deletedAt: null,
-  createdAt: new Date('2022-01-01T00:00:00.000Z'),
-  updatedAt: new Date('2022-01-01T00:00:00.000Z'),
 });

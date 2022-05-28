@@ -6,6 +6,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { DatabaseModule } from './db/db.module';
 import { MailModule } from './mail/mail.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard';
@@ -22,15 +23,19 @@ import { SharedModule } from './shared/shared.module';
       isGlobal: true,
     }),
     MikroOrmModule.forRootAsync({
-      useFactory: (configService: ConfigService) => {
+      useFactory: async (configService: ConfigService) => {
         return {
           dbName:
             configService.get<string>('NODE_ENV') === 'test'
-              ? configService.get<string>('DB_TEST_NAME')
+              ? 'mikro_orm_test'
               : configService.get<string>('DB_NAME'),
+          allowGlobalContext:
+            configService.get<string>('NODE_ENV') === 'test' ? true : false,
         };
       },
+      inject: [ConfigService],
     }),
+
     ThrottlerModule.forRoot({
       limit: 1000,
       ttl: 60,
@@ -44,6 +49,7 @@ import { SharedModule } from './shared/shared.module';
       }),
       inject: [ConfigService],
     }),
+    DatabaseModule,
     MailModule,
     UsersModule,
     AuthModule,

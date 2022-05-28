@@ -13,7 +13,7 @@ import { Role } from '../../roles/entities/role.entity';
 @SoftDeletable(() => User, 'deletedAt', () => new Date())
 @Entity()
 export class User extends CustomBaseEntity {
-  @Property()
+  @Property({ unique: true })
   email!: string;
 
   @Property({ hidden: true })
