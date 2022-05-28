@@ -7,47 +7,34 @@ import {
   Patch,
   Post,
   Query,
-  Req,
-  UseGuards,
 } from '@nestjs/common';
-import { CurrentUser } from '../../shared/decorators/current-user.decorator';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CreateUserDto } from './dto/create-user.dto';
+import { PaginatedUsersDto } from './dto/paginated-users.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from './entities/user.entity';
 import { UsersService } from './users.service';
 
-@UseGuards(JwtAuthGuard)
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  create(@Req() req, @Body() createUserDto: CreateUserDto) {
-    console.log(createUserDto);
+  create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
 
   @Get()
-  findAll(@CurrentUser() user: User) {
-    console.log(user);
+  findAll() {
     return this.usersService.findAll();
   }
 
   @Get('/paginated/index')
-  paginated(@Query() query: any) {
-    console.log(query);
+  paginated(@Query() query: PaginatedUsersDto) {
     return this.usersService.paginate(query);
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(id);
-  }
-
-  @Get('/email/:email')
-  findByEmail(@Param('email') email: string) {
-    return this.usersService.findByEmail(email);
   }
 
   @Patch(':id')

@@ -21,7 +21,16 @@ import { SharedModule } from './shared/shared.module';
       envFilePath: '.env',
       isGlobal: true,
     }),
-    MikroOrmModule.forRoot(),
+    MikroOrmModule.forRootAsync({
+      useFactory: (configService: ConfigService) => {
+        return {
+          dbName:
+            configService.get<string>('NODE_ENV') === 'test'
+              ? configService.get<string>('DB_TEST_NAME')
+              : configService.get<string>('DB_NAME'),
+        };
+      },
+    }),
     ThrottlerModule.forRoot({
       limit: 1000,
       ttl: 60,
@@ -46,7 +55,8 @@ import { SharedModule } from './shared/shared.module';
   controllers: [AppController],
   providers: [
     AppService,
-    { provide: APP_GUARD, useClass: JwtAuthGuard },
+    { provide: APP_GUARD, useExisting: JwtAuthGuard },
+    JwtAuthGuard,
     { provide: APP_GUARD, useClass: ThrottlerGuard },
   ],
 })
