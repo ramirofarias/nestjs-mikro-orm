@@ -7,6 +7,7 @@ describe('PasswordResetController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [PasswordResetController],
+      providers: [],
     }).compile();
 
     controller = module.get<PasswordResetController>(PasswordResetController);
