@@ -44,7 +44,7 @@ export class MailProcessor {
   }
 
   @Process(MailJobsEnum.PasswordReset)
-  async sendPasswordResetEmail(job: Job) {
-    await this.mailService.sendPasswordResetEmail(job.data.email, job.data.url);
+  public sendPasswordResetEmail(job: Job) {
+    this.mailService.sendPasswordResetEmail(job.data.email, job.data.url);
   }
 }

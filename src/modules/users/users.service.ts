@@ -55,14 +55,19 @@ export class UsersService {
   }
 
   async findByEmail(email: string) {
-    const user = await this.userRepository.findOne({ email });
-    return user;
+    return this.userRepository.findOneOrFail({ email });
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
     return `This action updates a #${id} user`;
   }
 
+  async resetPassword(email: string, password: string) {
+    const user = await this.findByEmail(email);
+    user.password = hash(password);
+    this.userRepository.flush();
+    return user;
+  }
   remove(id: number) {
     return `This action removes a #${id} user`;
   }

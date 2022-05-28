@@ -30,7 +30,7 @@ export class MailService {
     });
   }
 
-  async sendPasswordResetEmail(email: string, url: string) {
+  public sendPasswordResetEmail(email: string, url: string) {
     this.mailerService.sendMail({
       to: email,
       from: '"Nest test" <nest@test.com>', // override default from

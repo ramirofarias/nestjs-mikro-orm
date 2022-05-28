@@ -1,12 +1,10 @@
-import { NotFoundError, ValidationError } from '@mikro-orm/core';
+import { NotFoundError } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityRepository } from '@mikro-orm/postgresql';
-import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
 import * as crypto from 'crypto';
 import { MailJobsEnum } from '../../mail/mail-job.types';
 import { MailService } from '../../mail/mail.service';
-import { hash } from '../auth/utils/bcrypt';
 import { UsersService } from '../users/users.service';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { PasswordReset } from './password-reset.entity';
@@ -17,13 +15,11 @@ export class PasswordResetService {
     @InjectRepository(PasswordReset)
     private readonly passwordResetRepository: EntityRepository<PasswordReset>,
     private usersService: UsersService,
-    private mailerService: MailerService,
     private mailService: MailService,
   ) {}
 
   async findByEmail(email: string) {
-    const resetAttempt = await this.passwordResetRepository.findOne({ email });
-    return resetAttempt;
+    return this.passwordResetRepository.findOne({ email });
   }
 
   async forgotPassword(email: string) {
@@ -41,7 +37,7 @@ export class PasswordResetService {
     });
 
     if (previousAttempt) {
-      this.passwordResetRepository.remove(previousAttempt);
+      this.passwordResetRepository.removeAndFlush(previousAttempt);
     }
   }
 
@@ -53,38 +49,33 @@ export class PasswordResetService {
     });
 
     await this.passwordResetRepository.persistAndFlush(newResetAttempt);
-    await this.sendPasswordResetEmail(email, token);
+    this.sendPasswordResetEmail(email, token);
   }
 
   private async sendPasswordResetEmail(email: string, token: string) {
     const url = `http://localhost:3000/forgot-password/${token}`;
 
-    this.mailService.enqueueMail(MailJobsEnum.PasswordReset, {
+    await this.mailService.enqueueMail(MailJobsEnum.PasswordReset, {
       email: email,
       url: url,
     });
   }
 
-  private async resetPassword(resetPasswordDto: ResetPasswordDto) {
+  public async resetPassword(resetPasswordDto: ResetPasswordDto) {
     const resetAttempt = await this.passwordResetRepository.findOne({
       token: resetPasswordDto.token,
     });
-    if (!resetAttempt) {
+    if (!resetAttempt || resetAttempt.expiresAt < new Date()) {
       throw new NotFoundError('Invalid token');
     }
-    if (resetAttempt.expiresAt < new Date()) {
-      this.passwordResetRepository.remove(resetAttempt);
-      throw new ValidationError('Invalid token');
-    }
 
-    const user = await this.usersService.findByEmail(resetAttempt.email);
-    if (!user) {
-      throw new NotFoundError('User not found');
-    }
+    const user = await this.usersService.resetPassword(
+      resetAttempt.email,
+      resetPasswordDto.password,
+    );
 
-    user.password = hash(resetPasswordDto.password);
-    this.usersService.update(user.id, user);
-    this.passwordResetRepository.remove(resetAttempt);
+    this.passwordResetRepository.removeAndFlush(resetAttempt);
+
     return user;
   }
 }

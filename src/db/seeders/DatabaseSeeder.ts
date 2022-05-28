@@ -1,5 +1,6 @@
 import type { EntityManager } from '@mikro-orm/core';
 import { Seeder } from '@mikro-orm/seeder';
+import { hash } from '../../modules/auth/utils/bcrypt';
 import { Country } from '../../modules/countries/entities/country.entity';
 import { CountryFactory } from '../../modules/countries/entities/country.factory';
 import { Role } from '../../modules/roles/entities/role.entity';
@@ -32,7 +33,11 @@ export class DatabaseSeeder extends Seeder {
     country: Country,
   ): Promise<any> {
     const adminUser = new UserFactory(em)
-      .makeOne({ country: country })
+      .makeOne({
+        country: country,
+        email: 'admin@test.com',
+        password: hash('password'),
+      })
       .roles.set([adminRole]);
     const regularUsers = new UserFactory(em)
       .each((user) => {

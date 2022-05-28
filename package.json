@@ -19,6 +19,7 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
+    "migration:create-initial": "npx mikro-orm migration:create --initial",
     "migration:create": "npx mikro-orm migration:create",
     "migration:up": "npx mikro-orm migration:up",
     "migrate:fresh": "npx mikro-orm migration:fresh",
