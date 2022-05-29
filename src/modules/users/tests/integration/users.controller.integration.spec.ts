@@ -32,7 +32,7 @@ describe('UsersController (e2e)', () => {
     app = module.createNestApplication();
     await app.init();
     httpServer = app.getHttpServer();
-    em = module.get(DatabaseService).getEm();
+    em = module.get(DatabaseService).getEm().fork();
     orm = module.get(DatabaseService).getORM();
     await orm.getMigrator().up();
   });

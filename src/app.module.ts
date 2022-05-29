@@ -1,12 +1,12 @@
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { BullModule } from '@nestjs/bull';
-import { CacheInterceptor, CacheModule, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import * as redisStore from 'cache-manager-redis-store';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { RedisModule } from './db/cache/redis.module';
 import { DatabaseModule } from './db/db.module';
 import { MailModule } from './mail/mail.module';
 import { AuthModule } from './modules/auth/auth.module';
@@ -49,15 +49,8 @@ import { SharedModule } from './shared/shared.module';
       }),
       inject: [ConfigService],
     }),
-    CacheModule.register({
-      store: redisStore,
-      socket: {
-        host: 'localhost',
-        port: 6379,
-      },
-      isGlobal: true,
-    }),
     DatabaseModule,
+    RedisModule,
     MailModule,
     UsersModule,
     AuthModule,
@@ -72,10 +65,6 @@ import { SharedModule } from './shared/shared.module';
     { provide: APP_GUARD, useExisting: JwtAuthGuard },
     JwtAuthGuard,
     { provide: APP_GUARD, useClass: ThrottlerGuard },
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: CacheInterceptor,
-    },
   ],
 })
 export class AppModule {}

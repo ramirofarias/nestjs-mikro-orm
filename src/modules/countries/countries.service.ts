@@ -1,3 +1,4 @@
+import { MikroORM, UseRequestContext } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityRepository } from '@mikro-orm/postgresql';
 import { Injectable } from '@nestjs/common';
@@ -10,11 +11,13 @@ export class CountriesService {
   constructor(
     @InjectRepository(Country)
     private readonly countryRepository: EntityRepository<Country>,
+    private orm: MikroORM,
   ) {}
   create(createCountryDto: CreateCountryDto) {
     return 'This action adds a new country';
   }
 
+  @UseRequestContext()
   findAll() {
     return this.countryRepository.findAll();
   }
