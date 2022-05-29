@@ -42,6 +42,9 @@ import { MailService } from './mail.service';
           host: config.get('REDIS_HOST'),
           port: config.get('REDIS_PORT'),
         },
+        defaultJobOptions: {
+          removeOnComplete: true,
+        },
       }),
       inject: [ConfigService],
     }),

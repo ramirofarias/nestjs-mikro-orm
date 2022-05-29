@@ -18,7 +18,6 @@ import { RedisService } from './redis.service';
 export class RedisModule {
   constructor(@Inject(CACHE_MANAGER) cacheManager) {
     const client = cacheManager.store.getClient();
-
     client.on('error', (error) => {
       console.error(error);
     });

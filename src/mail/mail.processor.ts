@@ -2,6 +2,7 @@ import {
   OnGlobalQueueCompleted,
   OnQueueActive,
   OnQueueCompleted,
+  OnQueueError,
   OnQueueFailed,
   Process,
   Processor,
@@ -35,8 +36,13 @@ export class MailProcessor {
     );
   }
 
+  @OnQueueError()
+  onError(error) {
+    console.log('error!!!', error);
+  }
+
   @OnQueueFailed()
-  onError(job: Job<any>, error) {
+  onFailure(job: Job<any>, error) {
     console.log(
       `Processor:@OnQueueFailed - Failed job ${job.id} of type ${job.name}: ${error.message}`,
       error.stack,

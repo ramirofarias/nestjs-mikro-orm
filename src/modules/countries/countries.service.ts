@@ -29,7 +29,7 @@ export class CountriesService {
       const countries = await this.cacheManager.get('countries');
       if (!countries) {
         const countries = await this.countryRepository.findAll();
-        this.cacheManager.set('countries', countries);
+        this.cacheManager.set('countries', countries, { ttl: 60 });
         return countries;
       }
       return countries;
