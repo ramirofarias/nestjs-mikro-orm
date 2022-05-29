@@ -29,13 +29,7 @@ export class CountriesController {
 
   @Get()
   async findAll() {
-    if (this.cacheManager.store.getClient().connected) {
-      return this.getOrSetCache('countries', () => {
-        return this.countriesService.findAll();
-      });
-    } else {
-      return this.countriesService.findAll();
-    }
+    return this.countriesService.findAll();
   }
 
   getOrSetCache(key, cb) {
